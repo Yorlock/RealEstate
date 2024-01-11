@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<schema xmlns="http://www.w3.org/2001/XMLSchema"
+	targetNamespace="http://www.realestate.org"
+	xmlns:tns="http://www.realestate.org" elementFormDefault="qualified"
+	xmlns:bpt="http://www.realestate.org/types">
+	<import schemaLocation="realEstateTypes.xsd"
+		namespace="http://www.realestate.org/types" />
+	<element name="getCreditRequest">
+		<complexType>
+			<sequence>
+				<element name="creditRecipient" type="bpt:CreditRecipientInfo" />
+				<element name="creditInfo" type="bpt:CreditInfo" />
+			</sequence>
+		</complexType>
+	</element>
+	<element name="getCreditResponse" type="bpt:ContractInfo" />
+	<element name="cancelCreditRequest">
+		<complexType>
+			<attribute name="creditId" type="int" />
+		</complexType>
+	</element>
+	<element name="cancelCreditResponse" type="bpt:ContractInfo" />
+	<element name="creditFault" type="bpt:Fault" />
+</schema>

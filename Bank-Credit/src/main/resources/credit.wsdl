@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<wsdl:definitions
+	xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/"
+	xmlns:tns="http://www.realestate.org/credit/"
+	xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema" name="credit"
+	targetNamespace="http://www.realestate.org/credit/"
+	xmlns:bp="http://www.realestate.org">
+	<wsdl:types>
+		<xsd:schema targetNamespace="http://www.realestate.org/">
+			<xsd:import schemaLocation="credit.xsd"
+				namespace="http://www.realestate.org" />
+		</xsd:schema>
+	</wsdl:types>
+	<wsdl:message name="getCreditRequestMsg">
+		<wsdl:part element="bp:getCreditRequest" name="payload" />
+	</wsdl:message>
+	<wsdl:message name="getCreditResponseMsg">
+		<wsdl:part element="bp:getCreditResponse" name="payload" />
+	</wsdl:message>
+	<wsdl:message name="cancelCreditRequestMsg">
+		<wsdl:part element="bp:cancelCreditRequest" name="payload" />
+	</wsdl:message>
+	<wsdl:message name="cancelCreditResponseMsg">
+		<wsdl:part element="bp:cancelCreditResponse" name="payload" />
+	</wsdl:message>
+	<wsdl:message name="creditFaultMsg">
+		<wsdl:part element="bp:creditFault" name="payload" />
+	</wsdl:message>
+	<wsdl:portType name="GetCredit">
+		<wsdl:operation name="getCredit">
+			<wsdl:input message="tns:getCreditRequestMsg" />
+			<wsdl:output message="tns:getCreditResponseMsg" />
+			<wsdl:fault message="tns:creditFaultMsg"
+				name="creditFault" />
+		</wsdl:operation>
+		<wsdl:operation name="cancelCredit">
+			<wsdl:input message="tns:cancelCreditRequestMsg" />
+			<wsdl:output message="tns:cancelCreditResponseMsg" />
+			<wsdl:fault message="tns:creditFaultMsg"
+				name="creditFault" />
+		</wsdl:operation>
+	</wsdl:portType>
+	<wsdl:binding name="GetCreditSOAP" type="tns:GetCredit">
+		<soap:binding style="document"
+			transport="http://schemas.xmlsoap.org/soap/http" />
+		<wsdl:operation name="getCredit">
+			<soap:operation
+				soapAction="http://www.realestate.org/credit/getCredit" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="creditFault">
+				<soap:fault name="creditFault" use="literal" />
+			</wsdl:fault>
+		</wsdl:operation>
+		<wsdl:operation name="cancelCredit">
+			<soap:operation
+				soapAction="http://www.realestate.org/credit/cancelCredit" />
+			<wsdl:input>
+				<soap:body use="literal" />
+			</wsdl:input>
+			<wsdl:output>
+				<soap:body use="literal" />
+			</wsdl:output>
+			<wsdl:fault name="creditFault">
+				<soap:fault name="creditFault" use="literal" />
+			</wsdl:fault>
+		</wsdl:operation>
+	</wsdl:binding>
+	<wsdl:service name="GetCreditService">
+		<wsdl:port binding="tns:GetCreditSOAP" name="GetCreditPort">
+			<soap:address
+				location="http://www.realestate.org/credit/" />
+		</wsdl:port>
+	</wsdl:service>
+</wsdl:definitions>

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="windows-1250" ?>
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+            xmlns="http://www.realestate.org/types"
+            targetNamespace="http://www.realestate.org/types"
+            elementFormDefault="qualified">
+      <xsd:complexType name="CreditRecipientInfo">
+        <xsd:sequence>
+          <xsd:element name="numberOfCreditRecipient" type="xsd:int"/>
+          <xsd:element name="sumIncomeYear" type="xsd:int"/>
+          <xsd:element name="NumberCurrentlyOwningProperties" type="xsd:int"/>
+          <xsd:element name="sumSpendingYear" type="xsd:int"/>
+          <xsd:element name="sumChildren" type="xsd:int"/>
+          <xsd:element name="mainRecipientFirstName" type="xsd:string"/>
+          <xsd:element name="mainRecipientLastName" type="xsd:string"/>
+          <xsd:element name="mainRecipientTelefonNumber" type="xsd:int"/>
+          <xsd:element name="mainRecipientPesel" type="xsd:int"/>
+        </xsd:sequence>
+      </xsd:complexType>
+     <xsd:complexType name="CreditInfo">
+	     <xsd:sequence>
+	       <xsd:element name="lendingRateInPercent" type="xsd:int"/>
+	       <xsd:element name="howManyMonths" type="xsd:int"/>
+	       <xsd:element name="monthPayment" type="xsd:int"/>
+	       <xsd:element name="creditVolume" type="xsd:int"/>
+	       <xsd:element name="firstPaymentDate" type="xsd:dateTime"/> <!-- < format: 2022-09-24 > -->
+      </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="RealEstateInfo">
+	     <xsd:sequence>
+	       <xsd:element name="price" type="xsd:int"/>
+	       <xsd:element name="yearBuilt" type="xsd:int"/>
+	       <xsd:element name="averageRentPrice" type="xsd:int"/>
+	       <xsd:element name="apartmentSizeInSquareMeters" type="xsd:float"/>
+	       <xsd:element name="numberOfRooms" type="xsd:int"/>
+      </xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="ContractInfo">
+    	<xsd:sequence>
+    		<xsd:element name="id" type="xsd:int"/>
+    		<xsd:element name="date" type="xsd:dateTime"/>
+    	</xsd:sequence>
+    </xsd:complexType>
+    <xsd:complexType name="Fault">
+    	<xsd:sequence>
+    		<xsd:element name="code" type="xsd:int"/>
+    		<xsd:element name="text" type="xsd:string"/>
+    	</xsd:sequence>
+    </xsd:complexType>
+</xsd:schema>
