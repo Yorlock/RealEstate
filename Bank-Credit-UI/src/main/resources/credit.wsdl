@@ -1,0 +1,39 @@
+<?xml version='1.0' encoding='UTF-8'?><wsdl:definitions xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:tns="http://credit.bp.org/" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/" xmlns:ns3="http://schemas.xmlsoap.org/soap/http" xmlns:ns1="http://www.realestate.org/credit/" name="GetCreditEndpointService" targetNamespace="http://credit.bp.org/">
+  <wsdl:import location="http://localhost:8080/soap-api/service/credit?wsdl=GetCredit.wsdl" namespace="http://www.realestate.org/credit/">
+    </wsdl:import>
+  <wsdl:binding name="GetCreditEndpointServiceSoapBinding" type="ns1:GetCredit">
+    <soap:binding style="document" transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="cancelCredit">
+      <soap:operation soapAction="http://www.realestate.org/credit/cancelCredit" style="document"/>
+      <wsdl:input name="cancelCredit">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="cancelCreditResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="CreditFaultMsg">
+        <soap:fault name="CreditFaultMsg" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+    <wsdl:operation name="getCredit">
+      <soap:operation soapAction="http://www.realestate.org/credit/getCredit" style="document"/>
+      <wsdl:input name="getCredit">
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output name="getCreditResponse">
+        <soap:body use="literal"/>
+      </wsdl:output>
+      <wsdl:fault name="DatatypeConfigurationException">
+        <soap:fault name="DatatypeConfigurationException" use="literal"/>
+      </wsdl:fault>
+      <wsdl:fault name="CreditFaultMsg">
+        <soap:fault name="CreditFaultMsg" use="literal"/>
+      </wsdl:fault>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="GetCreditEndpointService">
+    <wsdl:port binding="tns:GetCreditEndpointServiceSoapBinding" name="GetCreditEndpointPort">
+      <soap:address location="http://localhost:8080/soap-api/service/credit"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>
