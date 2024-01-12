@@ -1,0 +1,157 @@
+openapi: 3.0.1
+info:
+  title: Buying RealEstate mircro service
+  description: Micro service to buy a real estate and get credit
+  contact:
+    email: supportm@bp.org
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: 1.0.0
+servers:
+  - url: http://localhost:8090
+tags:
+- name: Real Estate
+  description: Buy real estate and get credit
+paths:
+  /buyRealEstate:
+    post:
+      tags:
+      - realEstate
+      summary: Buying real estate
+      operationId: buyRealEstate
+      requestBody:
+        description: Details of real estate and credit which you are taking
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BuyRealEstateRequest'
+        required: true
+      responses:
+        400:
+          description: Problem during processing of the buying
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ExceptionResponse'
+                
+components:
+  schemas:
+    ContractInfo:
+      type: object
+      properties:
+        id:
+          type: string
+        date:
+          type: string
+          format: date-time
+    CreditInfo:
+      type: object
+      properties:
+        lendingRateInPercent:
+          type: integer
+          format: int32
+        howManyMonths:
+          type: integer
+          format: int32
+        monthPayment:
+          type: integer
+          format: int32
+        creditVolume:
+          type: integer
+          format: int32
+        firstPaymentDate:
+          type: string
+          format: date-time
+    RealEstateInfo:
+      type: object
+      properties:
+        price:
+          type: integer
+          format: int32
+        yearBuilt:
+          type: integer
+          format: int32
+        averageRentPrice:
+          type: integer
+          format: int32
+        apartmentSizeInSquareMeters:
+          type: number
+          format: float
+        numberOfRooms:
+          type: integer
+          format: int32
+    CreditRecipientInfo:
+      type: object
+      properties:
+        numberOfCreditRecipient:
+          type: integer
+          format: int32
+        sumIncomeYear:
+          type: integer
+          format: int32
+        numberCurrentlyOwningProperties:
+          type: integer
+          format: int32
+        sumSpendingYear:
+          type: integer
+          format: int32
+        sumChildren:
+          type: integer
+          format: int32
+        mainRecipientFirstName:
+          type: string
+        mainRecipientLastName:
+          type: string
+        mainRecipientTelefonNumber:
+          type: integer
+          format: int32
+        mainRecipientPesel:
+          type: integer
+          format: int32
+    PaymentCard:
+      type: object
+      properties:
+        name:
+          type: string
+        validTo:
+          type: string
+        number:
+          type: string
+    ExceptionResponse:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          format: date-time
+        message:
+          type: string
+    BuyRealEstateRequest:
+      type: object
+      properties:
+        realEstateInfo:
+          $ref: '#/components/schemas/RealEstateInfo'
+        creditRecipientInfo:
+          $ref: '#/components/schemas/CreditRecipientInfo'
+        creditInfo:
+          $ref: '#/components/schemas/CreditInfo'
+        paymentCard:
+          $ref: '#/components/schemas/PaymentCard'
+        fee:
+          type: integer
+          format: int32
+        address:
+          type: string
+    GetCreditRequest:
+      type: object
+      properties:
+        creditRecipientInfo:
+          $ref: '#/components/schemas/CreditRecipientInfo'
+        creditInfo:
+          $ref: '#/components/schemas/CreditInfo'
+    BookRealEstateRequest:
+      type: object
+      properties:
+        realEstateInfo:
+          $ref: '#/components/schemas/RealEstateInfo'
+    

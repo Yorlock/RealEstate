@@ -1,0 +1,149 @@
+{
+	"openapi": "3.0.1",
+	"info": {
+		"title": "OpenAPI definition",
+		"version": "v0"
+	},
+	"servers": [
+		{
+			"url": "http://localhost:8083",
+			"description": "Generated server url"
+		}
+	],
+	"paths": {
+		"/signContract": {
+			"post": {
+				"tags": [
+					"signContract-service"
+				],
+				"summary": "sign contract operation",
+				"description": "operation for signing contract",
+				"operationId": "signContract",
+				"requestBody": {
+					"content": {
+						"application/json": {
+							"schema": {
+								"$ref": "#/components/schemas/SignContractRequest"
+							}
+						}
+					},
+					"required": true
+				},
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/SignContractResponse"
+								}
+							}
+						}
+					},
+					"400": {
+						"description": "Bad Request",
+						"content": {
+							"application/json": {
+								"schema": {
+									"$ref": "#/components/schemas/ExceptionResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		},
+		"/signContract/{id}": {
+			"get": {
+				"tags": [
+					"signContract-service"
+				],
+				"operationId": "getSignContract",
+				"parameters": [
+					{
+						"name": "id",
+						"in": "path",
+						"required": true,
+						"schema": {
+							"type": "integer",
+							"format": "int32"
+						}
+					}
+				],
+				"responses": {
+					"200": {
+						"description": "OK",
+						"content": {
+							"*/*": {
+								"schema": {
+									"$ref": "#/components/schemas/SignContractResponse"
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	},
+	"components": {
+		"schemas": {
+			"SignContractResponse": {
+				"type": "object",
+				"properties": {
+					"transactionId": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"transactionDate": {
+						"type": "string",
+						"format": "date-time"
+					}
+				}
+			},
+			"ExceptionResponse": {
+				"type": "object",
+				"properties": {
+					"timestamp": {
+						"type": "string",
+						"format": "date-time"
+					},
+					"message": {
+						"type": "string"
+					},
+					"details": {
+						"type": "string"
+					}
+				}
+			},
+			"PaymentCard": {
+				"type": "object",
+				"properties": {
+					"name": {
+						"type": "string"
+					},
+					"validTo": {
+						"type": "string"
+					},
+					"number": {
+						"type": "string"
+					}
+				}
+			},
+			"SignContractRequest": {
+				"type": "object",
+				"properties": {
+					"paymentCard": {
+						"$ref": "#/components/schemas/PaymentCard"
+					},
+					"fee": {
+						"type": "integer",
+						"format": "int32"
+					},
+					"address": {
+						"type": "string"
+					}
+				}
+			}
+		}
+	}
+}
