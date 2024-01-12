@@ -22,13 +22,13 @@ public class GetCreditController {
 	private static final QName SERVICE_NAME = new QName("http://credit.bp.org/", "GetCreditEndpointService");
 
 	@GetMapping("/getCredit")
-	public String bookRoomForm(Model model) {
+	public String getCreditForm(Model model) {
 		model.addAttribute("getCreditRequest", new GetCreditRequest());
 		return "getCredit";
 	}
 	
 	@PostMapping("/getCredit")
-	public String bookRoom(@ModelAttribute GetCreditRequest brf, Model model) {
+	public String getCredit(@ModelAttribute GetCreditRequest brf, Model model) {
 		URL wsdlURL = GetCreditEndpointService.WSDL_LOCATION;
 		
 		GetCreditEndpointService ss = new GetCreditEndpointService(wsdlURL, SERVICE_NAME);

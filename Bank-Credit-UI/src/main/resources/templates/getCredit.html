@@ -7,12 +7,13 @@
 <body>
 	<h1>Getting Credit</h1>
     <form action="#" th:action="@{/getCredit}" th:object="${getCreditRequest}" method="post">
-        <p>Lending Rate In Percent: <input type="number" th:field="*{credit.lendingRateInPercent}" /></p>
-        <p>How Many Months: <input type="number" th:field="*{credit.howManyMonths}" /></p>
-        <p>Month Payment: <input type="number" th:field="*{credit.monthPayment}" /></p>
-        <p>Credit Volume: <input type="number" th:field="*{credit.creditVolume}" /></p>
-    	<p>First Payment Date (YYYY-MM-DD): <input type="date" th:field="*{credit.firstPaymentDate}" /></p>
-        
+        <p>Lending Rate In Percent: <input type="text" th:field="*{creditInfo.lendingRateInPercent}" /></p>
+        <p>How Many Months: <input type="text" th:field="*{creditInfo.howManyMonths}" /></p>
+        <p>First Month Payment: <input type="text" th:field="*{creditInfo.monthPayment}" /></p>
+        <p>Credit Volume: <input type="text" th:field="*{creditInfo.creditVolume}" /></p>
+    	<!--
+    	<p>First Payment Date (YYYY-MM-DD): <input type="datetime-local" th:field="*{creditInfo.firstPaymentDate}" /></p>
+        -->
         <p><input type="submit" value="Submit" /> <input type="reset" value="Reset" /></p>
     </form>
 </body>

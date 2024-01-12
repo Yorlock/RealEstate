@@ -36,6 +36,18 @@ public class GetCreditEndpoint implements GetCredit {
 			throw fault;
 		}
 		
+		if (payload != null && payload.getCreditInfo() != null && (payload.getCreditInfo().getCreditVolume() < 0 || 
+						payload.getCreditInfo().getHowManyMonths() < 0 || 
+						payload.getCreditInfo().getMonthPayment() < 0 ||
+						payload.getCreditInfo().getLendingRateInPercent() < 0)) {
+			Fault creditFault = new Fault();
+			creditFault.setCode(11);
+			creditFault.setText("Credit is invalid");
+			
+			CreditFaultMsg fault = new CreditFaultMsg("Credit is invalid", creditFault);
+			throw fault;
+		}
+		
 		ContractInfo response = new ContractInfo();
 		response.setId(1);
 		

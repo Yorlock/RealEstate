@@ -1,18 +1,26 @@
 
 package org.realestate.types;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.GregorianCalendar;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
-
 /**
- * <p>Java class for CreditInfo complex type.
+ * <p>
+ * Java class for CreditInfo complex type.
  * 
- * <p>The following schema fragment specifies the expected content contained within this class.
+ * <p>
+ * The following schema fragment specifies the expected content contained within
+ * this class.
  * 
  * <pre>
  * &lt;complexType name="CreditInfo"&gt;
@@ -33,109 +41,121 @@ import javax.xml.datatype.XMLGregorianCalendar;
  * 
  */
 @XmlAccessorType(XmlAccessType.FIELD)
-@XmlType(name = "CreditInfo", propOrder = {
-    "lendingRateInPercent",
-    "howManyMonths",
-    "monthPayment",
-    "creditVolume",
-    "firstPaymentDate"
-})
+@XmlType(name = "CreditInfo", propOrder = { "lendingRateInPercent", "howManyMonths", "monthPayment", "creditVolume",
+		"firstPaymentDate" })
 public class CreditInfo {
 
-    protected int lendingRateInPercent;
-    protected int howManyMonths;
-    protected int monthPayment;
-    protected int creditVolume;
-    @XmlElement(required = true)
-    @XmlSchemaType(name = "dateTime")
-    protected XMLGregorianCalendar firstPaymentDate;
+	protected int lendingRateInPercent;
+	protected int howManyMonths;
+	protected int monthPayment;
+	protected int creditVolume;
+	@XmlElement(required = true)
+	@XmlSchemaType(name = "dateTime")
+	protected XMLGregorianCalendar firstPaymentDate;
 
-    /**
-     * Gets the value of the lendingRateInPercent property.
-     * 
-     */
-    public int getLendingRateInPercent() {
-        return lendingRateInPercent;
-    }
+	/**
+	 * Gets the value of the lendingRateInPercent property.
+	 * 
+	 */
+	public int getLendingRateInPercent() {
+		return lendingRateInPercent;
+	}
 
-    /**
-     * Sets the value of the lendingRateInPercent property.
-     * 
-     */
-    public void setLendingRateInPercent(int value) {
-        this.lendingRateInPercent = value;
-    }
+	/**
+	 * Sets the value of the lendingRateInPercent property.
+	 * 
+	 */
+	public void setLendingRateInPercent(int value) {
+		this.lendingRateInPercent = value;
+	}
 
-    /**
-     * Gets the value of the howManyMonths property.
-     * 
-     */
-    public int getHowManyMonths() {
-        return howManyMonths;
-    }
+	/**
+	 * Gets the value of the howManyMonths property.
+	 * 
+	 */
+	public int getHowManyMonths() {
+		return howManyMonths;
+	}
 
-    /**
-     * Sets the value of the howManyMonths property.
-     * 
-     */
-    public void setHowManyMonths(int value) {
-        this.howManyMonths = value;
-    }
+	/**
+	 * Sets the value of the howManyMonths property.
+	 * 
+	 */
+	public void setHowManyMonths(int value) {
+		this.howManyMonths = value;
+	}
 
-    /**
-     * Gets the value of the monthPayment property.
-     * 
-     */
-    public int getMonthPayment() {
-        return monthPayment;
-    }
+	/**
+	 * Gets the value of the monthPayment property.
+	 * 
+	 */
+	public int getMonthPayment() {
+		return monthPayment;
+	}
 
-    /**
-     * Sets the value of the monthPayment property.
-     * 
-     */
-    public void setMonthPayment(int value) {
-        this.monthPayment = value;
-    }
+	/**
+	 * Sets the value of the monthPayment property.
+	 * 
+	 */
+	public void setMonthPayment(int value) {
+		this.monthPayment = value;
+	}
 
-    /**
-     * Gets the value of the creditVolume property.
-     * 
-     */
-    public int getCreditVolume() {
-        return creditVolume;
-    }
+	/**
+	 * Gets the value of the creditVolume property.
+	 * 
+	 */
+	public int getCreditVolume() {
+		return creditVolume;
+	}
 
-    /**
-     * Sets the value of the creditVolume property.
-     * 
-     */
-    public void setCreditVolume(int value) {
-        this.creditVolume = value;
-    }
+	/**
+	 * Sets the value of the creditVolume property.
+	 * 
+	 */
+	public void setCreditVolume(int value) {
+		this.creditVolume = value;
+	}
 
-    /**
-     * Gets the value of the firstPaymentDate property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link XMLGregorianCalendar }
-     *     
-     */
-    public XMLGregorianCalendar getFirstPaymentDate() {
-        return firstPaymentDate;
-    }
+	/**
+	 * Gets the value of the firstPaymentDate property.
+	 * 
+	 * @return possible object is {@link XMLGregorianCalendar }
+	 * 
+	 */
+	public XMLGregorianCalendar getFirstPaymentDate() {
+		return firstPaymentDate;
+	}
 
-    /**
-     * Sets the value of the firstPaymentDate property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link XMLGregorianCalendar }
-     *     
-     */
-    public void setFirstPaymentDate(XMLGregorianCalendar value) {
-        this.firstPaymentDate = value;
-    }
+	/**
+	 * Sets the value of the firstPaymentDate property.
+	 * 
+	 * @param value allowed object is {@link XMLGregorianCalendar }
+	 * 
+	 */
+	public void setFirstPaymentDate(XMLGregorianCalendar value) {
+		try {
+			this.firstPaymentDate = value;
+		} catch (Exception e) {
+			this.firstPaymentDate = null;
+		}
+	}
+
+	public void setFirstPaymentDate(String value) {
+
+		GregorianCalendar gc;
+		XMLGregorianCalendar c = null;
+		try {
+			DateFormat df = new SimpleDateFormat("YYYY-MM-DD");
+			Date date = df.parse(value);
+
+			gc = new GregorianCalendar();
+			gc.setTime(date);
+			c = DatatypeFactory.newInstance().newXMLGregorianCalendar(gc);
+		} catch (Exception e) {
+			c = null;
+		}
+		this.firstPaymentDate = c;
+	}
 
 }
