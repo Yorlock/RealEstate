@@ -40,8 +40,8 @@ public class BuyRealEstateService extends RouteBuilder {
 
 	@Override
 	public void configure() throws Exception {
-		realEstateExceptionHandlers();
 		getCreditExceptionHandlers();
+		bookRealEstateExceptionHandlers();
 		gateway();
 		credit();
 		realState();
@@ -116,8 +116,8 @@ public class BuyRealEstateService extends RouteBuilder {
 
 				}).marshal().json().to("stream:out").choice()
 				.when(header("previousState").isEqualTo(ProcessingState.CANCELLED))
-				.to("direct:bookFlightCompensationAction").otherwise().setHeader("serviceType", constant("flight"))
-				.to("kafka:BookingInfoTopic?brokers=localhost:9092").endChoice();
+				.to("direct:bookRealEstateCompensationAction").otherwise().setHeader("serviceType", constant("realEstate"))
+				.to("kafka:ContractInfoTopic?brokers=localhost:9092").endChoice();
 
 		from("kafka:BuyRealEstateFailTopic?brokers=localhost:9092").routeId("bookRealEstateCompensation")
 				.log("fired bookRealEstateCompensation").unmarshal().json(JsonLibrary.Jackson, ExceptionResponse.class)
@@ -161,7 +161,7 @@ public class BuyRealEstateService extends RouteBuilder {
 					}
 				}).marshal().json().to("stream:out").choice()
 				.when(header("previousState").isEqualTo(ProcessingState.CANCELLED))
-				.to("direct:bookHotelCompensationAction").otherwise().setHeader("serviceType", constant("credit"))
+				.to("direct:getCreditCompensationAction").otherwise().setHeader("serviceType", constant("credit"))
 				.to("kafka:ContractInfoTopic?brokers=localhost:9092").endChoice();
 
 		from("kafka:BuyRealEstateFailTopic?brokers=localhost:9092").routeId("getCreditCompensation")
@@ -201,14 +201,14 @@ public class BuyRealEstateService extends RouteBuilder {
 				.to("kafka:RealEstateReqTopic?brokers=localhost:9092");
 	}
 
-	private void realEstateExceptionHandlers() {
+	private void bookRealEstateExceptionHandlers() {
 		onException(RealEstateException.class).process((exchange) -> {
 			ExceptionResponse er = new ExceptionResponse();
 			er.setTimestamp(OffsetDateTime.now());
 			Exception cause = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Exception.class);
 			er.setMessage(cause.getMessage());
 			exchange.getMessage().setBody(er);
-		}).marshal().json().to("stream:out").setHeader("serviceType", constant("flight"))
+		}).marshal().json().to("stream:out").setHeader("serviceType", constant("realEstate"))
 				.to("kafka:BuyRealEstateFailTopic?brokers=localhost:9092").handled(true);
 	}
 
