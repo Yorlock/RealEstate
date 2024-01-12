@@ -1,11 +1,17 @@
 
 package org.realestate.types;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.GregorianCalendar;
+
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlSchemaType;
 import javax.xml.bind.annotation.XmlType;
+import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
 
 
@@ -135,7 +141,28 @@ public class CreditInfo {
      *     
      */
     public void setFirstPaymentDate(XMLGregorianCalendar value) {
-        this.firstPaymentDate = value;
-    }
+		try {
+			this.firstPaymentDate = value;
+		} catch (Exception e) {
+			this.firstPaymentDate = null;
+		}
+	}
+
+	public void setFirstPaymentDate(String value) {
+
+		GregorianCalendar gc;
+		XMLGregorianCalendar c = null;
+		try {
+			DateFormat df = new SimpleDateFormat("YYYY-MM-DD");
+			Date date = df.parse(value);
+
+			gc = new GregorianCalendar();
+			gc.setTime(date);
+			c = DatatypeFactory.newInstance().newXMLGregorianCalendar(gc);
+		} catch (Exception e) {
+			c = null;
+		}
+		this.firstPaymentDate = c;
+	}
 
 }

@@ -36,7 +36,8 @@ public class GetCreditEndpoint implements GetCredit {
 			throw fault;
 		}
 		
-		if (payload != null && payload.getCreditInfo() != null && (payload.getCreditInfo().getCreditVolume() < 0 || 
+		if (payload != null && payload.getCreditInfo() != null && 
+						(payload.getCreditInfo().getCreditVolume() < 0 || 
 						payload.getCreditInfo().getHowManyMonths() < 0 || 
 						payload.getCreditInfo().getMonthPayment() < 0 ||
 						payload.getCreditInfo().getLendingRateInPercent() < 0)) {
