@@ -14,6 +14,7 @@ import org.bp.realEstate.model.ContractInfo;
 import org.bp.realEstate.model.Utils;
 import org.bp.realEstate.PaymentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import org.bp.realEstate.exceptions.RealEstateException;
@@ -25,6 +26,12 @@ import org.bp.realEstate.state.StateService;
 
 @Component
 public class BuyRealEstateService extends RouteBuilder {
+
+	@Value("${realEstate.kafka.server}")
+	private String realEstateKafkaServer;
+
+	@Value("${realEstate.service.type}")
+	private String realEstateServiceType;
 
 	@Autowired
 	ContractIdentifierService contractIdentifierService;
@@ -40,18 +47,24 @@ public class BuyRealEstateService extends RouteBuilder {
 
 	@Override
 	public void configure() throws Exception {
-		getCreditExceptionHandlers();
-		bookRealEstateExceptionHandlers();
-		gateway();
-		credit();
-		realState();
-		signContract();
+		if (realEstateServiceType.equals("all") || realEstateServiceType.equals("credit"))
+			getCreditExceptionHandlers();
+		if (realEstateServiceType.equals("all") || realEstateServiceType.equals("realState"))
+			bookRealEstateExceptionHandlers();
+		if (realEstateServiceType.equals("all") || realEstateServiceType.equals("gateway"))
+			gateway();
+		if (realEstateServiceType.equals("all") || realEstateServiceType.equals("credit"))
+			credit();
+		if (realEstateServiceType.equals("all") || realEstateServiceType.equals("realState"))
+			realState();
+		if (realEstateServiceType.equals("all") || realEstateServiceType.equals("signContract"))
+			signContract();
 	}
 
 	private void signContract() {
-		from("kafka:ContractInfoTopic?brokers=localhost:9092").routeId("paymentContractInfo")
-				.log("fired paymentContractInfo").unmarshal().json(JsonLibrary.Jackson, ContractInfo.class)
-				.process((exchange) -> {
+		from("kafka:ContractInfoTopic?brokers=" + realEstateKafkaServer + "&groupId=" + realEstateServiceType)
+				.routeId("paymentContractInfo").log("fired paymentContractInfo").unmarshal()
+				.json(JsonLibrary.Jackson, ContractInfo.class).process((exchange) -> {
 					String contractId = exchange.getMessage().getHeader("contractId", String.class);
 					boolean isReady = paymentService.addBookingInfo(contractId,
 							exchange.getMessage().getBody(ContractInfo.class),
@@ -59,8 +72,9 @@ public class BuyRealEstateService extends RouteBuilder {
 					exchange.getMessage().setHeader("isReady", isReady);
 				}).choice().when(header("isReady").isEqualTo(true)).to("direct:finalizePayment").endChoice();
 
-		from("kafka:RealEstateReqTopic?brokers=localhost:9092").routeId("signContractReq").log("fired signContractReq")
-				.unmarshal().json(JsonLibrary.Jackson, BuyRealEstateRequest.class).process((exchange) -> {
+		from("kafka:RealEstateReqTopic?brokers=" + realEstateKafkaServer + "&groupId=" + realEstateServiceType)
+				.routeId("signContractReq").log("fired signContractReq").unmarshal()
+				.json(JsonLibrary.Jackson, BuyRealEstateRequest.class).process((exchange) -> {
 					String contractId = exchange.getMessage().getHeader("contractId", String.class);
 					boolean isReady = paymentService.addBuyRealEstateRequest(contractId,
 							exchange.getMessage().getBody(BuyRealEstateRequest.class));
@@ -82,14 +96,18 @@ public class BuyRealEstateService extends RouteBuilder {
 			contractInfo.setId(contractId);
 			contractInfo.setDate(finalDate);
 			exchange.getMessage().setBody(contractInfo);
+
+			realEstateStateService.sendEvent(contractId, ProcessingEvent.COMPLETE);
+			creditStateService.sendEvent(contractId, ProcessingEvent.COMPLETE);
 		}).to("direct:notification");
 
 		from("direct:notification").routeId("notification").log("fired notification").to("stream:out");
 	}
 
 	private void realState() {
-		from("kafka:RealEstateReqTopic?brokers=localhost:9092").routeId("bookRealEstate").log("fired bookRealEstate")
-				.unmarshal().json(JsonLibrary.Jackson, BuyRealEstateRequest.class).process((exchange) -> {
+		from("kafka:RealEstateReqTopic?brokers=" + realEstateKafkaServer + "&groupId=" + realEstateServiceType)
+				.routeId("bookRealEstate").log("fired bookRealEstate").unmarshal()
+				.json(JsonLibrary.Jackson, BuyRealEstateRequest.class).process((exchange) -> {
 
 					String contractId = exchange.getMessage().getHeader("contractId", String.class);
 					ProcessingState previousState = realEstateStateService.sendEvent(contractId, ProcessingEvent.START);
@@ -116,12 +134,15 @@ public class BuyRealEstateService extends RouteBuilder {
 
 				}).marshal().json().to("stream:out").choice()
 				.when(header("previousState").isEqualTo(ProcessingState.CANCELLED))
-				.to("direct:bookRealEstateCompensationAction").otherwise().setHeader("serviceType", constant("realEstate"))
-				.to("kafka:ContractInfoTopic?brokers=localhost:9092").endChoice();
+				.to("direct:bookRealEstateCompensationAction").otherwise()
+				.setHeader("serviceType", constant("realEstate"))
+				.to("kafka:ContractInfoTopic?brokers=" + realEstateKafkaServer + "&groupId=" + realEstateServiceType)
+				.endChoice();
 
-		from("kafka:BuyRealEstateFailTopic?brokers=localhost:9092").routeId("bookRealEstateCompensation")
-				.log("fired bookRealEstateCompensation").unmarshal().json(JsonLibrary.Jackson, ExceptionResponse.class)
-				.choice().when(header("serviceType").isNotEqualTo("realEstate")).process((exchange) -> {
+		from("kafka:BuyRealEstateFailTopic?brokers=" + realEstateKafkaServer + "&groupId=" + realEstateServiceType)
+				.routeId("bookRealEstateCompensation").log("fired bookRealEstateCompensation").unmarshal()
+				.json(JsonLibrary.Jackson, ExceptionResponse.class).choice()
+				.when(header("serviceType").isNotEqualTo("realEstate")).process((exchange) -> {
 					String contractId = exchange.getMessage().getHeader("contractId", String.class);
 					ProcessingState previousState = realEstateStateService.sendEvent(contractId,
 							ProcessingEvent.CANCEL);
@@ -134,7 +155,8 @@ public class BuyRealEstateService extends RouteBuilder {
 	}
 
 	private void credit() {
-		from("kafka:RealEstateReqTopic?brokers=localhost:9092").routeId("getCredit").log("fired getCredit").unmarshal()
+		from("kafka:RealEstateReqTopic?brokers=" + realEstateKafkaServer + "&groupId=" + realEstateServiceType)
+				.routeId("getCredit").log("fired getCredit").unmarshal()
 				.json(JsonLibrary.Jackson, BuyRealEstateRequest.class).process((exchange) -> {
 					String contractId = exchange.getMessage().getHeader("contractId", String.class);
 					ProcessingState previousState = creditStateService.sendEvent(contractId, ProcessingEvent.START);
@@ -162,11 +184,13 @@ public class BuyRealEstateService extends RouteBuilder {
 				}).marshal().json().to("stream:out").choice()
 				.when(header("previousState").isEqualTo(ProcessingState.CANCELLED))
 				.to("direct:getCreditCompensationAction").otherwise().setHeader("serviceType", constant("credit"))
-				.to("kafka:ContractInfoTopic?brokers=localhost:9092").endChoice();
+				.to("kafka:ContractInfoTopic?brokers=" + realEstateKafkaServer + "&groupId=" + realEstateServiceType)
+				.endChoice();
 
-		from("kafka:BuyRealEstateFailTopic?brokers=localhost:9092").routeId("getCreditCompensation")
-				.log("fired getCreditCompensation").unmarshal().json(JsonLibrary.Jackson, ExceptionResponse.class)
-				.choice().when(header("serviceType").isNotEqualTo("credit")).process((exchange) -> {
+		from("kafka:BuyRealEstateFailTopic?brokers=" + realEstateKafkaServer + "&groupId=" + realEstateServiceType)
+				.routeId("getCreditCompensation").log("fired getCreditCompensation").unmarshal()
+				.json(JsonLibrary.Jackson, ExceptionResponse.class).choice()
+				.when(header("serviceType").isNotEqualTo("credit")).process((exchange) -> {
 					String contractId = exchange.getMessage().getHeader("contractId", String.class);
 					ProcessingState previousState = creditStateService.sendEvent(contractId, ProcessingEvent.CANCEL);
 					exchange.getMessage().setHeader("previousState", previousState);
@@ -198,7 +222,7 @@ public class BuyRealEstateService extends RouteBuilder {
 		});
 
 		from("direct:BuyRealEstateRequest").routeId("BuyRealEstateRequest").log("brokerTopic fired").marshal().json()
-				.to("kafka:RealEstateReqTopic?brokers=localhost:9092");
+				.to("kafka:RealEstateReqTopic?brokers=" + realEstateKafkaServer + "&groupId=" + realEstateServiceType);
 	}
 
 	private void bookRealEstateExceptionHandlers() {
@@ -208,8 +232,9 @@ public class BuyRealEstateService extends RouteBuilder {
 			Exception cause = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Exception.class);
 			er.setMessage(cause.getMessage());
 			exchange.getMessage().setBody(er);
-		}).marshal().json().to("stream:out").setHeader("serviceType", constant("realEstate"))
-				.to("kafka:BuyRealEstateFailTopic?brokers=localhost:9092").handled(true);
+		}).marshal().json().to("stream:out").setHeader("serviceType", constant("realEstate")).to(
+				"kafka:BuyRealEstateFailTopic?brokers=" + realEstateKafkaServer + "&groupId=" + realEstateServiceType)
+				.handled(true);
 	}
 
 	private void getCreditExceptionHandlers() {
@@ -219,7 +244,8 @@ public class BuyRealEstateService extends RouteBuilder {
 			Exception cause = exchange.getProperty(Exchange.EXCEPTION_CAUGHT, Exception.class);
 			er.setMessage(cause.getMessage());
 			exchange.getMessage().setBody(er);
-		}).marshal().json().to("stream:out").setHeader("serviceType", constant("credit"))
-				.to("kafka:BuyRealEstateFailTopic?brokers=localhost:9092").handled(true);
+		}).marshal().json().to("stream:out").setHeader("serviceType", constant("credit")).to(
+				"kafka:BuyRealEstateFailTopic?brokers=" + realEstateKafkaServer + "&groupId=" + realEstateServiceType)
+				.handled(true);
 	}
 }
