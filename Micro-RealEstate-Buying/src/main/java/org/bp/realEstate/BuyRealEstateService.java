@@ -3,7 +3,6 @@ package org.bp.realEstate;
 import org.apache.camel.Exchange;
 import org.apache.camel.builder.RouteBuilder;
 import static org.apache.camel.model.rest.RestParamType.body;
-import java.math.BigDecimal;
 import java.time.OffsetDateTime;
 
 import org.apache.camel.builder.RouteBuilder;
@@ -27,10 +26,10 @@ import org.bp.realEstate.state.StateService;
 @Component
 public class BuyRealEstateService extends RouteBuilder {
 
-	@Value("${realEstate.kafka.server}")
+	@Value("${realestate.kafka.server}")
 	private String realEstateKafkaServer;
 
-	@Value("${realEstate.service.type}")
+	@Value("${realestate.service.type}")
 	private String realEstateServiceType;
 
 	@Autowired
@@ -53,10 +52,10 @@ public class BuyRealEstateService extends RouteBuilder {
 			bookRealEstateExceptionHandlers();
 		if (realEstateServiceType.equals("all") || realEstateServiceType.equals("gateway"))
 			gateway();
-		if (realEstateServiceType.equals("all") || realEstateServiceType.equals("credit"))
-			credit();
 		if (realEstateServiceType.equals("all") || realEstateServiceType.equals("realState"))
 			realState();
+		if (realEstateServiceType.equals("all") || realEstateServiceType.equals("credit"))
+			credit();
 		if (realEstateServiceType.equals("all") || realEstateServiceType.equals("signContract"))
 			signContract();
 	}
@@ -97,8 +96,8 @@ public class BuyRealEstateService extends RouteBuilder {
 			contractInfo.setDate(finalDate);
 			exchange.getMessage().setBody(contractInfo);
 
-			realEstateStateService.sendEvent(contractId, ProcessingEvent.COMPLETE);
-			creditStateService.sendEvent(contractId, ProcessingEvent.COMPLETE);
+			//realEstateStateService.sendEvent(contractId, ProcessingEvent.COMPLETE);
+			//creditStateService.sendEvent(contractId, ProcessingEvent.COMPLETE);
 		}).to("direct:notification");
 
 		from("direct:notification").routeId("notification").log("fired notification").to("stream:out");
@@ -119,14 +118,20 @@ public class BuyRealEstateService extends RouteBuilder {
 						if (brer != null && brer.getRealEstateInfo() != null
 								&& brer.getRealEstateInfo().getNumberOfRooms() != null) {
 							int numberOfRooms = brer.getRealEstateInfo().getNumberOfRooms();
-							if (numberOfRooms > 3 && numberOfRooms < 99) {
-								ci.setDate(OffsetDateTime.now().plusMinutes(50000));
-							} else if (numberOfRooms > 100) {
+							if (numberOfRooms >= 100) {
 								throw new RealEstateException("Too many rooms: " + numberOfRooms);
-							} else {
-								ci.setDate(OffsetDateTime.now().plusMinutes(100));
+							}
+							else if (numberOfRooms > 3) {
+								ci.setDate(OffsetDateTime.now().plusDays(44));
+							}
+							else {
+								ci.setDate(OffsetDateTime.now().plusDays(12));
 							}
 						}
+						else {
+							ci.setDate(OffsetDateTime.now().plusDays(9));
+						}
+						
 						exchange.getMessage().setBody(ci);
 						previousState = realEstateStateService.sendEvent(contractId, ProcessingEvent.FINISH);
 					}
@@ -170,14 +175,20 @@ public class BuyRealEstateService extends RouteBuilder {
 						if (brer != null && brer.getCreditRecipientInfo() != null
 								&& brer.getCreditRecipientInfo().getMainRecipientFirstName() != null) {
 							String firstName = brer.getCreditRecipientInfo().getMainRecipientFirstName();
-							if (firstName.equals("Dominik")) {
-								ci.setDate(OffsetDateTime.now());
-							} else if (firstName.length() < 3) {
+							if (firstName.length() < 3) {
 								throw new CreditException("Invalid first name: " + firstName);
-							} else {
-								ci.setDate(OffsetDateTime.now().plusMinutes(10000));
+							}
+							else if (firstName.equals("Dominik")) {
+								ci.setDate(OffsetDateTime.now().plusDays(6));
+							}
+							else {
+								ci.setDate(OffsetDateTime.now().plusDays(2));
 							}
 						}
+						else {
+							ci.setDate(OffsetDateTime.now());
+						}
+						
 						exchange.getMessage().setBody(ci);
 						previousState = creditStateService.sendEvent(contractId, ProcessingEvent.FINISH);
 					}
@@ -212,16 +223,16 @@ public class BuyRealEstateService extends RouteBuilder {
 				.description("The real estate to buy").endParam().responseMessage().code(200)
 				.message("Real estate successfully bought").endResponseMessage().to("direct:buyRealEstate");
 
-		from("direct:buyRealEstate").routeId("buyRealEstate").log("buyRealEstate fired").process((exchange) -> {
+		from("direct:buyRealEstate").routeId("buyRealEstate").log("fired buyRealEstate").process((exchange) -> {
 			exchange.getMessage().setHeader("buyingRealEstateId", contractIdentifierService.getContractIdentifier());
 		}).to("direct:BuyRealEstateRequest").to("direct:buyRequester");
 
-		from("direct:buyRequester").routeId("buyRequester").log("buyRequester fired").process((exchange) -> {
+		from("direct:buyRequester").routeId("buyRequester").log("fired buyRequester").process((exchange) -> {
 			exchange.getMessage().setBody(Utils
 					.prepareBookingInfo(exchange.getMessage().getHeader("buyingRealEstateId", String.class), null));
 		});
 
-		from("direct:BuyRealEstateRequest").routeId("BuyRealEstateRequest").log("brokerTopic fired").marshal().json()
+		from("direct:BuyRealEstateRequest").routeId("BuyRealEstateRequest").log("fired brokerTopic").marshal().json()
 				.to("kafka:RealEstateReqTopic?brokers=" + realEstateKafkaServer + "&groupId=" + realEstateServiceType);
 	}
 
