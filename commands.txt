@@ -1,0 +1,21 @@
+sudo systemctl daemon-reload
+sudo systemctl start kafka
+sudo systemctl start zookeeper
+
+sudo systemctl stop kafka
+sudo systemctl stop zookeeper
+systemctl
+
+docker image ls
+docker rmi -f IMAGEID
+
+docker-compose up -d
+docker-compose stop
+docker-compose start
+
+
+docker-compose logs --follow --tail=0
+
+docker ps -a
+docker container prune -f
+

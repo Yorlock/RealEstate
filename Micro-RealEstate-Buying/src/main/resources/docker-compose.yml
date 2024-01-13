@@ -5,7 +5,7 @@ services:
     ports:
       - "2181:2181"
   kafka:
-    image: wurstmeister/kafka 
+    image: wurstmeister/kafka
     ports:
       - "9092:9092"
     depends_on:
@@ -24,13 +24,13 @@ services:
     environment:
       REALESTATE_KAFKA_SERVER: kafka:9092
       REALESTATE_SERVICE_TYPE: gateway
-  realEstate:
+  realestate:
     image: aznu/micro-realestate-buying
     depends_on:
       - kafka
     environment:
       REALESTATE_KAFKA_SERVER: kafka:9092
-      REALESTATE_SERVICE_TYPE: realEstate
+      REALESTATE_SERVICE_TYPE: realestate
   credit:
     image: aznu/micro-realestate-buying
     depends_on:
@@ -38,11 +38,11 @@ services:
     environment:
       REALESTATE_KAFKA_SERVER: kafka:9092
       REALESTATE_SERVICE_TYPE: credit
-  signContract:
+  signcontract:
     image: aznu/micro-realestate-buying
     depends_on:
       - kafka
     environment:
       REALESTATE_KAFKA_SERVER: kafka:9092
-      REALESTATE_SERVICE_TYPE: signContract
+      REALESTATE_SERVICE_TYPE: signcontract
 

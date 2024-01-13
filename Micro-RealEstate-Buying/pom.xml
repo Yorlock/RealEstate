@@ -35,36 +35,43 @@
 			<artifactId>camel-spring-boot-starter</artifactId>
 			<version>${camel.version}</version>
 		</dependency>
+		
 		<dependency>
 			<groupId>org.apache.camel.springboot</groupId>
 			<artifactId>camel-swagger-java-starter</artifactId>
 			<version>${camel.version}</version>
 		</dependency>
+		
 		<dependency>
 			<groupId>org.apache.camel.springboot</groupId>
 			<artifactId>camel-servlet-starter</artifactId>
 			<version>${camel.version}</version>
 		</dependency>
+		
 		<dependency>
 			<groupId>org.apache.camel.springboot</groupId>
 			<artifactId>camel-jackson-starter</artifactId>
 			<version>${camel.version}</version>
 		</dependency>
+		
 		<dependency>
 			<groupId>org.apache.camel.springboot</groupId>
 			<artifactId>camel-stream-starter</artifactId>
 			<version>${camel.version}</version>
 		</dependency>
+		
 		<dependency>
 			<groupId>org.webjars</groupId>
 			<artifactId>swagger-ui</artifactId>
 			<version>3.36.2</version>
 		</dependency>
+		
 		<dependency>
 			<groupId>org.webjars</groupId>
 			<artifactId>webjars-locator</artifactId>
 			<version>0.40</version>
 		</dependency>
+		
 		<dependency>
 			<groupId>org.apache.camel.springboot</groupId>
 			<artifactId>camel-kafka-starter</artifactId>
@@ -75,19 +82,33 @@
 	<build>
 		<plugins>
 			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+			</plugin>
+
+			<plugin>
 				<groupId>io.swagger.codegen.v3</groupId>
 				<artifactId>swagger-codegen-maven-plugin</artifactId>
-				<version>3.0.23</version>
+				<version>3.0.31</version>
+				<dependencies>
+					<dependency>
+						<groupId>com.github.jknack</groupId>
+						<artifactId>handlebars</artifactId>
+						<version>4.3.0</version>
+					</dependency>
+				</dependencies>
+
 				<executions>
 					<execution>
 						<goals>
 							<goal>generate</goal>
 						</goals>
 						<configuration>
-							<inputSpec>${project.basedir}/src/main/resources/realestate-buying.yaml</inputSpec>
+							<inputSpec>
+								${project.basedir}/src/main/resources/travel-booking.yaml</inputSpec>
 							<language>java</language>
 							<library>resttemplate</library>
-							<modelPackage>org.bp.realEstate.model</modelPackage>
+							<modelPackage>org.bp.travel.model</modelPackage>
 							<generateApis>false</generateApis>
 							<generateSupportingFiles>false</generateSupportingFiles>
 							<generateModelDocumentation>false</generateModelDocumentation>
@@ -99,10 +120,6 @@
 						</configuration>
 					</execution>
 				</executions>
-			</plugin>
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
 	</build>
